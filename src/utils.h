@@ -1,41 +1,50 @@
 #pragma once
 
-#include "range/v3/view/all.hpp"
+#include "range/v3/range/concepts.hpp"
 
-#include <algorithm>
-#include <ostream>
-#include <vector>
+CPP_def
+(
+    template(typename T, typename U)
+    concept BothRanges, ranges::InputRange<T> && ranges::InputRange<U>
+);
 
-using vec = std::vector<int>;
-using vec2d = std::vector<vec>;
-
-namespace std
+struct are_equal_fn
 {
+    CPP_template(typename T, typename U)(requires not BothRanges<T, U>)
+    bool operator()(T&& actual, U&& expected) const
+    {
+        return((T&&) actual == (U&&) expected);
+    }
 
-inline
-std::ostream& operator<<(std::ostream& s, const vec& v)
-{
-    s << ( v | ranges::view::all );
-    return s;
-}
+    CPP_template(typename Rng1, typename Rng2)(requires BothRanges<Rng1, Rng2>)
+    bool operator()(Rng1&& actual, Rng2&& expected) const
+    {
+        auto begin0 = ranges::begin(actual);
+        auto end0 = ranges::end(actual);
+        auto begin1 = ranges::begin(expected);
+        auto end1 = ranges::end(expected);
+        for(; begin0 != end0 && begin1 != end1; ++begin0, ++begin1)
+        {
+            if(!(*this)(*begin0, *begin1))
+            {
+                return false;
+            }
+        }
 
-inline
-std::ostream& operator<<(std::ostream& s, const vec2d& v)
-{
-    s << ( v | ranges::view::all );
-    return s;
-}
+        return begin0 == end0 && begin1 == end1;
+    }
 
-template <typename Range>
-bool operator==( const vec& v, const Range& r )
-{
-    return std::equal( v.begin(), v.end(), r.begin() );
-}
+    CPP_template(typename Rng, typename Val)(requires ranges::InputRange<Rng>)
+    bool operator()(Rng&& actual, std::initializer_list<Val>&& expected) const
+    {
+        return (*this)(actual, expected);
+    }
 
-template<typename Range>
-bool operator==( const vec2d& v, const Range& r )
-{
-    return std::equal( v.begin(), v.end(), r.begin());
-}
+    CPP_template(typename Rng, typename Val)(requires ranges::InputRange<Rng>)
+    bool operator()(Rng&& actual, std::initializer_list<std::initializer_list<Val>>&& expected) const
+    {
+        return (*this)(actual, expected);
+    }
+};
 
-}
+RANGES_INLINE_VARIABLE(are_equal_fn, are_equal)

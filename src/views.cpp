@@ -4,119 +4,181 @@
 
 #include "utils.h"
 
-namespace {
-
-struct Fixture
+namespace
 {
-    const vec firstNats = { 4, 5, 6, 7, 8, 9, 10 };
-};
 
+static const std::initializer_list<int> firstNats = { 4, 5, 6, 7, 8, 9, 10 };
+
+}  // namespace
+
+BOOST_AUTO_TEST_SUITE( RangeV3ViewsTests )
+
+
+BOOST_AUTO_TEST_CASE( AdjacentRemoveIf )
+{
+  const auto F = std::equal_to<int>{};
+
+  const std::initializer_list<int> input = { 1, 1, 1, 2, 2, 3, 4, 4, 4, 1 };
+  BOOST_CHECK( are_equal( input | ranges::view::adjacent_remove_if( F ), { 1, 2, 3, 4, 1 } ) );
 }
 
-BOOST_FIXTURE_TEST_SUITE(RangeV3ViewsTests, Fixture)
 
-BOOST_AUTO_TEST_CASE(All)
+BOOST_AUTO_TEST_CASE( All )
 {
-    BOOST_CHECK_EQUAL( (vec{ 4, 5, 6, 7, 8, 9, 10 }), firstNats | ranges::view::all );
+  BOOST_CHECK( are_equal( firstNats | ranges::view::all, { 4, 5, 6, 7, 8, 9, 10 } ) );
 }
 
-BOOST_AUTO_TEST_CASE(Chunk)
-{
-    const int N = 3;
 
-    // split range by subranges of N elements
-    BOOST_CHECK_EQUAL( (vec2d{ { 4, 5, 6 }, { 7, 8, 9 }, { 10 } }),
-                       firstNats | ranges::view::chunk( N ) );
+BOOST_AUTO_TEST_CASE( CartesianProduct )
+{
+    const auto a = { 1, 2, 3 };
+    const auto b = { 4, 5, 6 };
+
+    using CT = ranges::common_tuple<int, int>;
+    BOOST_CHECK( are_equal( ranges::view::cartesian_product( a, b ),
+                            {
+                                CT{ 1, 4 }, CT{ 1, 5 }, CT{ 1, 6 },
+                                CT{ 2, 4 }, CT{ 2, 5 }, CT{ 2, 6 },
+                                CT{ 3, 4 }, CT{ 3, 5 }, CT{ 3, 6 }
+                            } ) );
 }
 
-BOOST_AUTO_TEST_CASE(Concat)
+
+BOOST_AUTO_TEST_CASE( Chunk )
 {
-    // join two ranges into one
-    BOOST_CHECK_EQUAL( (vec{ 4, 5, 6, 7, 8, 9, 10, 4, 5, 6, 7, 8, 9, 10 }),
-                       ranges::view::concat( firstNats, firstNats ) );
+  const int N = 3;
+
+  // split range by subranges of N elements
+  BOOST_CHECK( are_equal( firstNats | ranges::view::chunk( N ),
+                          { { 4, 5, 6 }, { 7, 8, 9 }, { 10 } } ) );
 }
 
-BOOST_AUTO_TEST_CASE(Iota)
+
+// BOOST_AUTO_TEST_CASE( Common )
+
+
+BOOST_AUTO_TEST_CASE( Concat )
 {
-    const int N = 1;
-    const int M = 6;
-
-    // make range of elements [N, M)
-    BOOST_CHECK_EQUAL( (vec{ 1, 2, 3, 4, 5 }), ranges::view::iota( N, M ) );
-    BOOST_CHECK_EQUAL( (vec{ 1, 2, 3, 4, 5 }), ranges::view::ints( N, M ) );
-
-    // make range of elements [N, M]
-    BOOST_CHECK_EQUAL( (vec{ 1, 2, 3, 4, 5, 6 }), ranges::view::closed_iota( N, M ) );
+  // join two ranges into one
+  BOOST_CHECK( are_equal( ranges::view::concat( firstNats, firstNats ),
+                          { 4, 5, 6, 7, 8, 9, 10, 4, 5, 6, 7, 8, 9, 10 } ) );
 }
 
-BOOST_AUTO_TEST_CASE(PartialSum)
+
+// BOOST_AUTO_TEST_CASE( Const )
+
+
+// BOOST_AUTO_TEST_CASE( Counted )
+
+
+BOOST_AUTO_TEST_CASE( Cycle )
 {
-    BOOST_CHECK_EQUAL( (vec{ 4, 9, 15, 22, 30, 39, 49}), firstNats | ranges::view::partial_sum );
+  BOOST_CHECK( are_equal( firstNats | ranges::view::cycle | ranges::view::take( 18 ),
+               { 4, 5, 6, 7, 8, 9, 10, 4, 5, 6, 7, 8, 9, 10, 4, 5, 6, 7 } ) );
 }
 
-BOOST_AUTO_TEST_CASE(Repeat)
-{
-    const int N = 9;
 
-    // repeat value N infinite number of times
-    BOOST_CHECK_EQUAL( (vec{ 9, 9, 9, 9, 9 }), ranges::view::repeat( N ) | ranges::view::take( 5 ) );
+BOOST_AUTO_TEST_CASE( Delimit )
+{
+  const int N = 8;
+  // take range elements until element with value N is met
+  BOOST_CHECK( are_equal( firstNats | ranges::view::delimit( N ),
+                          { 4, 5, 6, 7 } ) );
 }
 
-BOOST_AUTO_TEST_CASE(Replace)
+BOOST_AUTO_TEST_CASE( Drop )
 {
-    const int X = 6;
-    const int Y = 99;
+  const int N = 3;
 
-    // replace elements values from X to Y
-    BOOST_CHECK_EQUAL( (vec{ 4, 5, 99, 7, 8, 9, 10 }), firstNats | ranges::view::replace( X, Y ) );
+  // drop first N elements
+  BOOST_CHECK( are_equal( firstNats | ranges::view::drop( N ),
+                          { 7, 8, 9, 10 } ) );
 }
 
-BOOST_AUTO_TEST_CASE(Reverse)
+BOOST_AUTO_TEST_CASE( Iota )
 {
-    BOOST_CHECK_EQUAL( (vec{ 10, 9, 8, 7, 6, 5, 4 }), firstNats | ranges::view::reverse );
+  const int N = 1;
+  const int M = 6;
+
+  // make range of elements [N...M)
+  BOOST_CHECK( are_equal( ranges::view::iota( N, M ), { 1, 2, 3, 4, 5 } ) );
+  BOOST_CHECK( are_equal( ranges::view::ints( N, M ), { 1, 2, 3, 4, 5 } ) );
+
+  // make range of elements [N...M]
+  BOOST_CHECK( are_equal( ranges::view::closed_iota( N, M ), { 1, 2, 3, 4, 5, 6 } ) );
 }
 
-BOOST_AUTO_TEST_CASE(Slice)
+BOOST_AUTO_TEST_CASE( PartialSum )
 {
-    const int N = 1;
-    const int M = 4;
-
-    // take elements from N-th to M-th
-    BOOST_CHECK_EQUAL( (vec{ 5, 6, 7, 8 }), firstNats | ranges::view::slice( N, M ) );
+  BOOST_CHECK( are_equal( firstNats | ranges::view::partial_sum, { 4, 9, 15, 22, 30, 39, 49 } ) );
 }
 
-BOOST_AUTO_TEST_CASE(Sliding)
+BOOST_AUTO_TEST_CASE( Repeat )
 {
-    BOOST_CHECK_EQUAL( (vec2d{ { 4, 5, 6 }, { 5, 6, 7 }, { 6, 7, 8 }, { 7, 8, 9 }, { 8, 9, 10 } }),
-                       firstNats | ranges::view::sliding( 3 ) );
+  const int N = 9;
+
+  // repeat value N infinite number of times and 5 elements are taken from the infinite range
+  BOOST_CHECK( are_equal( ranges::view::repeat( N ) | ranges::view::take( 5 ), { 9, 9, 9, 9, 9 } ) );
 }
 
-BOOST_AUTO_TEST_CASE(Stride)
+BOOST_AUTO_TEST_CASE( Replace )
 {
-    const int N = 3;
+  const int X = 6;
+  const int Y = 99;
 
-    // keep only every N-th element
-    BOOST_CHECK_EQUAL( (vec{ 4, 7, 10 }), firstNats | ranges::view::stride( N ) );
+  // replace elements values from X to Y
+  BOOST_CHECK( are_equal ( firstNats | ranges::view::replace( X, Y ), { 4, 5, 99, 7, 8, 9, 10 } ) );
 }
 
-BOOST_AUTO_TEST_CASE(Tail)
+BOOST_AUTO_TEST_CASE( Reverse )
 {
-    // drop first element
-    BOOST_CHECK_EQUAL( (vec{ 5, 6, 7, 8, 9, 10 }), firstNats | ranges::view::tail );
+  BOOST_CHECK( are_equal ( firstNats | ranges::view::reverse, { 10, 9, 8, 7, 6, 5, 4 } ) );
 }
 
-BOOST_AUTO_TEST_CASE(Take)
+BOOST_AUTO_TEST_CASE( Slice )
 {
-    const int N = 4;
+  const int N = 1;
+  const int M = 4;
 
-    // keep only first N elements
-    BOOST_CHECK_EQUAL( (vec{ 4, 5, 6, 7 }), firstNats | ranges::view::take( N ) );
+  // take elements from N-th to M-th
+  BOOST_CHECK( are_equal ( firstNats | ranges::view::slice( N, M ), { 5, 6, 7 } ) );
 }
 
-BOOST_AUTO_TEST_CASE(Transform)
+BOOST_AUTO_TEST_CASE( Sliding )
 {
-    BOOST_CHECK_EQUAL( (vec{ 7, 8, 9, 10, 11, 12, 13 }),
-                       firstNats | ranges::view::transform( []( int n ) { return n + 3; } ) );
+  BOOST_CHECK( are_equal(
+      firstNats | ranges::view::sliding( 3 ),
+      { { 4, 5, 6 }, { 5, 6, 7 }, { 6, 7, 8 }, { 7, 8, 9 }, { 8, 9, 10 } } ) );
+}
+
+BOOST_AUTO_TEST_CASE( Stride )
+{
+  const int N = 3;
+
+  // keep only every N-th element
+  BOOST_CHECK( are_equal( firstNats | ranges::view::stride( N ), { 4, 7, 10 } ) );
+}
+
+BOOST_AUTO_TEST_CASE( Tail )
+{
+  // drop first element
+  BOOST_CHECK( are_equal( firstNats | ranges::view::tail, { 5, 6, 7, 8, 9, 10 } ) );
+}
+
+BOOST_AUTO_TEST_CASE( Take )
+{
+  const int N = 5;
+
+  // keep only first N elements
+  BOOST_CHECK( are_equal( firstNats | ranges::view::take( N ), { 4, 5, 6, 7, 8 } ) );
+}
+
+BOOST_AUTO_TEST_CASE( Transform )
+{
+  const auto F = []( int n ) { return n + 3; };
+
+  // apply F to every range element
+  BOOST_CHECK( are_equal( firstNats | ranges::view::transform( F ), { 7, 8, 9, 10, 11, 12, 13 } ) );
 }
 
 BOOST_AUTO_TEST_SUITE_END()
