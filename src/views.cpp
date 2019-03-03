@@ -152,6 +152,12 @@ BOOST_AUTO_TEST_CASE( Replace )
 }
 
 
+BOOST_AUTO_TEST_CASE( ReplaceIf )
+{
+    BOOST_CHECK( are_equal( firstNats | ranges::view::replace_if( []( const int X ){ return X % 2 == 0; }, 42 ), { 42, 5, 42, 7, 42, 9, 42 } ) );
+}
+
+
 BOOST_AUTO_TEST_CASE( Reverse )
 {
   BOOST_CHECK( are_equal( firstNats | ranges::view::reverse, { 10, 9, 8, 7, 6, 5, 4 } ) );
