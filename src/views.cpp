@@ -9,6 +9,12 @@ namespace
 
 static const std::initializer_list<int> firstNats = { 4, 5, 6, 7, 8, 9, 10 };
 
+template <typename T, typename K>
+auto pair( T&& t, K&& k )
+{
+    return std::pair<T,K>( std::forward<T>( t ), std::forward<K>( k ) );
+}
+
 }  // namespace
 
 BOOST_AUTO_TEST_SUITE( RangeV3ViewsTests )
@@ -18,7 +24,7 @@ BOOST_AUTO_TEST_CASE( AdjacentRemoveIf )
 {
   const auto F = std::equal_to<int>{};
 
-  const std::initializer_list<int> input = { 1, 1, 1, 2, 2, 3, 4, 4, 4, 1 };
+  const auto input = { 1, 1, 1, 2, 2, 3, 4, 4, 4, 1 };
   BOOST_CHECK( are_equal( input | ranges::view::adjacent_remove_if( F ), { 1, 2, 3, 4, 1 } ) );
 }
 
@@ -86,6 +92,7 @@ BOOST_AUTO_TEST_CASE( Delimit )
                           { 4, 5, 6, 7 } ) );
 }
 
+
 BOOST_AUTO_TEST_CASE( Drop )
 {
   const int N = 3;
@@ -94,6 +101,14 @@ BOOST_AUTO_TEST_CASE( Drop )
   BOOST_CHECK( are_equal( firstNats | ranges::view::drop( N ),
                           { 7, 8, 9, 10 } ) );
 }
+
+
+BOOST_AUTO_TEST_CASE( Enumerate )
+{
+    BOOST_CHECK( are_equal( firstNats | ranges::view::enumerate,
+    { pair( 0, 4 ), pair( 1, 5 ), pair( 2, 6 ), pair( 3, 7 ), pair( 4, 8 ), pair( 5, 9 ), pair( 6, 10 ) } ) );
+}
+
 
 BOOST_AUTO_TEST_CASE( Iota )
 {
@@ -108,10 +123,12 @@ BOOST_AUTO_TEST_CASE( Iota )
   BOOST_CHECK( are_equal( ranges::view::closed_iota( N, M ), { 1, 2, 3, 4, 5, 6 } ) );
 }
 
+
 BOOST_AUTO_TEST_CASE( PartialSum )
 {
   BOOST_CHECK( are_equal( firstNats | ranges::view::partial_sum, { 4, 9, 15, 22, 30, 39, 49 } ) );
 }
+
 
 BOOST_AUTO_TEST_CASE( Repeat )
 {
@@ -120,6 +137,17 @@ BOOST_AUTO_TEST_CASE( Repeat )
   // repeat value N infinite number of times and 5 elements are taken from the infinite range
   BOOST_CHECK( are_equal( ranges::view::repeat( N ) | ranges::view::take( 5 ), { 9, 9, 9, 9, 9 } ) );
 }
+
+
+BOOST_AUTO_TEST_CASE( RepeatN )
+{
+  const int N = 9;
+  const int M = 5;
+
+  // repeat value N M number of times
+  BOOST_CHECK( are_equal( ranges::view::repeat_n( N, M ), { 9, 9, 9, 9, 9 } ) );
+}
+
 
 BOOST_AUTO_TEST_CASE( Replace )
 {
@@ -130,10 +158,21 @@ BOOST_AUTO_TEST_CASE( Replace )
   BOOST_CHECK( are_equal ( firstNats | ranges::view::replace( X, Y ), { 4, 5, 99, 7, 8, 9, 10 } ) );
 }
 
+
 BOOST_AUTO_TEST_CASE( Reverse )
 {
   BOOST_CHECK( are_equal ( firstNats | ranges::view::reverse, { 10, 9, 8, 7, 6, 5, 4 } ) );
 }
+
+
+BOOST_AUTO_TEST_CASE( Single )
+{
+  const int N = 42;
+
+  // make a range containing a single element N
+  BOOST_CHECK( are_equal( ranges::view::single( N ), { 42 } ) );
+}
+
 
 BOOST_AUTO_TEST_CASE( Slice )
 {
@@ -144,12 +183,14 @@ BOOST_AUTO_TEST_CASE( Slice )
   BOOST_CHECK( are_equal ( firstNats | ranges::view::slice( N, M ), { 5, 6, 7 } ) );
 }
 
+
 BOOST_AUTO_TEST_CASE( Sliding )
 {
   BOOST_CHECK( are_equal(
       firstNats | ranges::view::sliding( 3 ),
       { { 4, 5, 6 }, { 5, 6, 7 }, { 6, 7, 8 }, { 7, 8, 9 }, { 8, 9, 10 } } ) );
 }
+
 
 BOOST_AUTO_TEST_CASE( Stride )
 {
@@ -159,11 +200,13 @@ BOOST_AUTO_TEST_CASE( Stride )
   BOOST_CHECK( are_equal( firstNats | ranges::view::stride( N ), { 4, 7, 10 } ) );
 }
 
+
 BOOST_AUTO_TEST_CASE( Tail )
 {
   // drop first element
   BOOST_CHECK( are_equal( firstNats | ranges::view::tail, { 5, 6, 7, 8, 9, 10 } ) );
 }
+
 
 BOOST_AUTO_TEST_CASE( Take )
 {
@@ -173,6 +216,7 @@ BOOST_AUTO_TEST_CASE( Take )
   BOOST_CHECK( are_equal( firstNats | ranges::view::take( N ), { 4, 5, 6, 7, 8 } ) );
 }
 
+
 BOOST_AUTO_TEST_CASE( Transform )
 {
   const auto F = []( int n ) { return n + 3; };
@@ -180,5 +224,18 @@ BOOST_AUTO_TEST_CASE( Transform )
   // apply F to every range element
   BOOST_CHECK( are_equal( firstNats | ranges::view::transform( F ), { 7, 8, 9, 10, 11, 12, 13 } ) );
 }
+
+
+BOOST_AUTO_TEST_CASE( Zip )
+{
+    const auto a = { 1, 2, 3 };
+    const auto b = { 4, 5, 6 };
+    BOOST_CHECK( are_equal( ranges::view::zip( a, b ), { pair( 1, 4 ), pair( 2, 5 ), pair( 3, 6 ) } ) );
+
+    const auto c = { 4, 5 };
+    BOOST_CHECK( are_equal( ranges::view::zip( a, c ), { pair( 1, 4 ), pair( 2, 5 ) } ) );
+    BOOST_CHECK( are_equal( ranges::view::zip( c, a ), { pair( 4, 1 ), pair( 5, 2 ) } ) );
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()
