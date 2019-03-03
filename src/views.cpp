@@ -12,7 +12,7 @@ static const std::initializer_list<int> firstNats = { 4, 5, 6, 7, 8, 9, 10 };
 template <typename T, typename K>
 auto pair( T&& t, K&& k )
 {
-    return std::pair<T,K>( std::forward<T>( t ), std::forward<K>( k ) );
+  return std::pair<T, K>( std::forward<T>( t ), std::forward<K>( k ) );
 }
 
 }  // namespace
@@ -37,16 +37,13 @@ BOOST_AUTO_TEST_CASE( All )
 
 BOOST_AUTO_TEST_CASE( CartesianProduct )
 {
-    const auto a = { 1, 2, 3 };
-    const auto b = { 4, 5, 6 };
+  const auto a = { 1, 2, 3 };
+  const auto b = { 4, 5, 6 };
 
-    using CT = ranges::common_tuple<int, int>;
-    BOOST_CHECK( are_equal( ranges::view::cartesian_product( a, b ),
-                            {
-                                CT{ 1, 4 }, CT{ 1, 5 }, CT{ 1, 6 },
-                                CT{ 2, 4 }, CT{ 2, 5 }, CT{ 2, 6 },
-                                CT{ 3, 4 }, CT{ 3, 5 }, CT{ 3, 6 }
-                            } ) );
+  using CT = ranges::common_tuple<int, int>;
+  BOOST_CHECK(
+      are_equal( ranges::view::cartesian_product( a, b ),
+                 { CT{ 1, 4 }, CT{ 1, 5 }, CT{ 1, 6 }, CT{ 2, 4 }, CT{ 2, 5 }, CT{ 2, 6 }, CT{ 3, 4 }, CT{ 3, 5 }, CT{ 3, 6 } } ) );
 }
 
 
@@ -55,8 +52,7 @@ BOOST_AUTO_TEST_CASE( Chunk )
   const int N = 3;
 
   // split range by subranges of N elements
-  BOOST_CHECK( are_equal( firstNats | ranges::view::chunk( N ),
-                          { { 4, 5, 6 }, { 7, 8, 9 }, { 10 } } ) );
+  BOOST_CHECK( are_equal( firstNats | ranges::view::chunk( N ), { { 4, 5, 6 }, { 7, 8, 9 }, { 10 } } ) );
 }
 
 
@@ -66,8 +62,7 @@ BOOST_AUTO_TEST_CASE( Chunk )
 BOOST_AUTO_TEST_CASE( Concat )
 {
   // join two ranges into one
-  BOOST_CHECK( are_equal( ranges::view::concat( firstNats, firstNats ),
-                          { 4, 5, 6, 7, 8, 9, 10, 4, 5, 6, 7, 8, 9, 10 } ) );
+  BOOST_CHECK( are_equal( ranges::view::concat( firstNats, firstNats ), { 4, 5, 6, 7, 8, 9, 10, 4, 5, 6, 7, 8, 9, 10 } ) );
 }
 
 
@@ -79,8 +74,8 @@ BOOST_AUTO_TEST_CASE( Concat )
 
 BOOST_AUTO_TEST_CASE( Cycle )
 {
-  BOOST_CHECK( are_equal( firstNats | ranges::view::cycle | ranges::view::take( 18 ),
-               { 4, 5, 6, 7, 8, 9, 10, 4, 5, 6, 7, 8, 9, 10, 4, 5, 6, 7 } ) );
+  BOOST_CHECK(
+      are_equal( firstNats | ranges::view::cycle | ranges::view::take( 18 ), { 4, 5, 6, 7, 8, 9, 10, 4, 5, 6, 7, 8, 9, 10, 4, 5, 6, 7 } ) );
 }
 
 
@@ -88,8 +83,7 @@ BOOST_AUTO_TEST_CASE( Delimit )
 {
   const int N = 8;
   // take range elements until element with value N is met
-  BOOST_CHECK( are_equal( firstNats | ranges::view::delimit( N ),
-                          { 4, 5, 6, 7 } ) );
+  BOOST_CHECK( are_equal( firstNats | ranges::view::delimit( N ), { 4, 5, 6, 7 } ) );
 }
 
 
@@ -98,15 +92,14 @@ BOOST_AUTO_TEST_CASE( Drop )
   const int N = 3;
 
   // drop first N elements
-  BOOST_CHECK( are_equal( firstNats | ranges::view::drop( N ),
-                          { 7, 8, 9, 10 } ) );
+  BOOST_CHECK( are_equal( firstNats | ranges::view::drop( N ), { 7, 8, 9, 10 } ) );
 }
 
 
 BOOST_AUTO_TEST_CASE( Enumerate )
 {
-    BOOST_CHECK( are_equal( firstNats | ranges::view::enumerate,
-    { pair( 0, 4 ), pair( 1, 5 ), pair( 2, 6 ), pair( 3, 7 ), pair( 4, 8 ), pair( 5, 9 ), pair( 6, 10 ) } ) );
+  BOOST_CHECK( are_equal( firstNats | ranges::view::enumerate,
+                          { pair( 0, 4 ), pair( 1, 5 ), pair( 2, 6 ), pair( 3, 7 ), pair( 4, 8 ), pair( 5, 9 ), pair( 6, 10 ) } ) );
 }
 
 
@@ -155,13 +148,13 @@ BOOST_AUTO_TEST_CASE( Replace )
   const int Y = 99;
 
   // replace elements values from X to Y
-  BOOST_CHECK( are_equal ( firstNats | ranges::view::replace( X, Y ), { 4, 5, 99, 7, 8, 9, 10 } ) );
+  BOOST_CHECK( are_equal( firstNats | ranges::view::replace( X, Y ), { 4, 5, 99, 7, 8, 9, 10 } ) );
 }
 
 
 BOOST_AUTO_TEST_CASE( Reverse )
 {
-  BOOST_CHECK( are_equal ( firstNats | ranges::view::reverse, { 10, 9, 8, 7, 6, 5, 4 } ) );
+  BOOST_CHECK( are_equal( firstNats | ranges::view::reverse, { 10, 9, 8, 7, 6, 5, 4 } ) );
 }
 
 
@@ -180,15 +173,13 @@ BOOST_AUTO_TEST_CASE( Slice )
   const int M = 4;
 
   // take elements from N-th to M-th
-  BOOST_CHECK( are_equal ( firstNats | ranges::view::slice( N, M ), { 5, 6, 7 } ) );
+  BOOST_CHECK( are_equal( firstNats | ranges::view::slice( N, M ), { 5, 6, 7 } ) );
 }
 
 
 BOOST_AUTO_TEST_CASE( Sliding )
 {
-  BOOST_CHECK( are_equal(
-      firstNats | ranges::view::sliding( 3 ),
-      { { 4, 5, 6 }, { 5, 6, 7 }, { 6, 7, 8 }, { 7, 8, 9 }, { 8, 9, 10 } } ) );
+  BOOST_CHECK( are_equal( firstNats | ranges::view::sliding( 3 ), { { 4, 5, 6 }, { 5, 6, 7 }, { 6, 7, 8 }, { 7, 8, 9 }, { 8, 9, 10 } } ) );
 }
 
 
@@ -228,13 +219,13 @@ BOOST_AUTO_TEST_CASE( Transform )
 
 BOOST_AUTO_TEST_CASE( Zip )
 {
-    const auto a = { 1, 2, 3 };
-    const auto b = { 4, 5, 6 };
-    BOOST_CHECK( are_equal( ranges::view::zip( a, b ), { pair( 1, 4 ), pair( 2, 5 ), pair( 3, 6 ) } ) );
+  const auto a = { 1, 2, 3 };
+  const auto b = { 4, 5, 6 };
+  BOOST_CHECK( are_equal( ranges::view::zip( a, b ), { pair( 1, 4 ), pair( 2, 5 ), pair( 3, 6 ) } ) );
 
-    const auto c = { 4, 5 };
-    BOOST_CHECK( are_equal( ranges::view::zip( a, c ), { pair( 1, 4 ), pair( 2, 5 ) } ) );
-    BOOST_CHECK( are_equal( ranges::view::zip( c, a ), { pair( 4, 1 ), pair( 5, 2 ) } ) );
+  const auto c = { 4, 5 };
+  BOOST_CHECK( are_equal( ranges::view::zip( a, c ), { pair( 1, 4 ), pair( 2, 5 ) } ) );
+  BOOST_CHECK( are_equal( ranges::view::zip( c, a ), { pair( 4, 1 ), pair( 5, 2 ) } ) );
 }
 
 
