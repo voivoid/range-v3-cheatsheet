@@ -117,6 +117,14 @@ BOOST_AUTO_TEST_CASE( Iota )
 }
 
 
+BOOST_AUTO_TEST_CASE( Join )
+{
+    const std::initializer_list<std::initializer_list<int>> v = { { 1, 2 }, { 3, 4 }, { 5, 6 } };
+    BOOST_CHECK( are_equal( v | ranges::view::join, { 1, 2, 3, 4, 5, 6 } ) );
+    BOOST_CHECK( are_equal( v | ranges::view::join( 0 ), { 1, 2, 0, 3, 4, 0, 5, 6 } ) );
+}
+
+
 BOOST_AUTO_TEST_CASE( PartialSum )
 {
   BOOST_CHECK( are_equal( firstNats | ranges::view::partial_sum, { 4, 9, 15, 22, 30, 39, 49 } ) );

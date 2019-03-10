@@ -34,7 +34,8 @@
 | iota                     | 1, 6                                                  | [ 1, 2, 3, 4, 5 ]                                                                                  |             |
 | ints                     | 1, 6                                                  | [ 1, 2, 3, 4, 5 ]                                                                                  |             |
 | istream                  |                                                       |                                                                                                    |             |
-| join                     |                                                       |                                                                                                    |             |
+| join                     | [ [ 1, 2 ], [ 3, 4 ], [ 5, 6] ]                       | [ 1, 2, 3, 4, 5, 6 ]                                                                               | Given a range of ranges, join them into a flattened sequence of elements |
+| join                     | [ [ 1, 2 ], [ 3, 4 ], [ 5, 6] ], 0                    | [ 1, 2, 0, 3, 4, 0, 5, 6 ]                                                                         | Optionally, you can specify a value or a range to be inserted between each source range. |
 | keys                     |                                                       |                                                                                                    |             |
 | linear_distribute        |                                                       |                                                                                                    |             |
 | move                     |                                                       |                                                                                                    |             |
