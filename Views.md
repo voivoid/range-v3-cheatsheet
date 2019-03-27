@@ -8,7 +8,6 @@
 | any_view                 |                                                       |                                                                                                    |             |
 | cartesian_product        | [ 1, 2, 3 ], [ 4, 5, 6 ]                              | [ [ 1, 4 ], [ 1, 5 ], [ 1, 6 ] ]<br>[ 2, 4 ], [ 2, 5 ], [ 2, 6 ]<br>[ 3, 4 ], [ 3, 5 ], [ 3, 6 ] ] |             |
 | chunk                    | [ 4, 5, 6, 7, 8, 9, 10 ], 3                           | [ [ 4, 5, 6 ], [ 7, 8, 9 ], [ 10 ] ]                                                               |             |
-| closed_iota              | 1, 6                                                  | [ 1, 2, 3, 4, 5, 6 ]                                                                               |             |
 | common                   |                                                       |                                                                                                    |             |
 | concat                   | [ 4, 5, 6, 7, 8, 9, 10 ], [ 4, 5, 6, 7, 8, 9, 10 ]    | [ 4, 5, 6, 7, 8, 9, 10, 4, 5, 6, 7, 8, 9, 10 ]                                                     |             |
 | const                    |                                                       |                                                                                                    |             |
@@ -21,18 +20,24 @@
 | drop_while               |                                                       |                                                                                                    |             |
 | empty                    |                                                       |                                                                                                    |             |
 | enumerate                | [ 4, 5, 6, 7, 8, 9, 10 ]                              | [ { 0, 4 }, { 1, 5 }, { 2, 6 }, { 3, 7 }, { 4, 8 }, { 5, 9 }, { 6, 10 } ]                          |             |
-| exclusive_scan           |                                                       |                                                                                                    |             |
-| filter                   |                                                       |                                                                                                    |             |
+| exclusive_scan           | [ 4, 5, 6, 7, 8, 9, 10 ], 1, { return a + b }         | [ 1, 5, 10, 16, 23, 31, 40 ]                                                                       |             |
+| filter                   | [ 4, 5, 6, 7, 8, 9, 10 ], { return a % 2 == 0 }       | [ 4, 6, 8, 10 ]                                                                                    |             |
 | for_each                 |                                                       |                                                                                                    |             |
 | generate                 |                                                       |                                                                                                    |             |
 | generate_n               |                                                       |                                                                                                    |             |
 | getlines                 |                                                       |                                                                                                    |             |
 | group_by                 |                                                       |                                                                                                    |             |
-| indices                  |                                                       |                                                                                                    |             |
+| indices                  | 6                                                     | [ 0, 1, 2, 3, 4, 5 ]                                                                               |             |
+| indices                  | 1, 6                                                  | [ 1, 2, 3, 4, 5 ]                                                                                  |             |
+| closed_indices           | 6                                                     | [ 0, 1, 2, 3, 4, 5, 6 ]                                                                            |             |
+| closed_indices           | 1, 6                                                  | [ 1, 2, 3, 4, 5, 6 ]                                                                               |             |
 | indirect                 |                                                       |                                                                                                    |             |
 | intersperse              |                                                       |                                                                                                    |             |
-| iota                     | 1, 6                                                  | [ 1, 2, 3, 4, 5 ]                                                                                  |             |
+| ints                     | without arguments                                     | [ 0, 1, 2, 3, 4, 5, 6, ... infinite range ]                                                        |             |
 | ints                     | 1, 6                                                  | [ 1, 2, 3, 4, 5 ]                                                                                  |             |
+| iota                     | 1                                                     | [ 1, 2, 3, 4, 5, 6, 7, ... infinite range ]                                                        |             |
+| iota                     | 1, 6                                                  | [ 1, 2, 3, 4, 5 ]                                                                                  |             |
+| closed_iota              | 1, 6                                                  | [ 1, 2, 3, 4, 5, 6 ]                                                                               |             |
 | istream                  |                                                       |                                                                                                    |             |
 | join                     | [ [ 1, 2 ], [ 3, 4 ], [ 5, 6] ]                       | [ 1, 2, 3, 4, 5, 6 ]                                                                               | Given a range of ranges, join them into a flattened sequence of elements |
 | join                     | [ [ 1, 2 ], [ 3, 4 ], [ 5, 6] ], 0                    | [ 1, 2, 0, 3, 4, 0, 5, 6 ]                                                                         | Optionally, you can specify a value or a range to be inserted between each source range. |
@@ -43,7 +48,7 @@
 | ref                      |                                                       |                                                                                                    |             |
 | remove                   |                                                       |                                                                                                    |             |
 | remove_if                |                                                       |                                                                                                    |             |
-| repeat                   | 9                                                     | [ 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, ... infinite range ]                                |             |
+| repeat                   | 9                                                     | [ 9, 9, 9, 9, 9, 9, 9, ... infinite range ]                                                        |             |
 | repeat_n                 | 9, 5                                                  | [ 9, 9, 9, 9, 9 ]                                                                                  |             |
 | replace                  | [ 4, 5, 6, 7, 8, 9, 10 ], 6, 99                       | [ 4, 5, 99, 7, 8, 9, 10 ]                                                                          |             |
 | replace_if               | [ 4, 5, 6, 7, 8, 9, 10 ], { return x % 2 == 0 }, 42   | [ 42, 5, 42, 7, 42, 9, 42 ]                                                                        |             |

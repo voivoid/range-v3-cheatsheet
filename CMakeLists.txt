@@ -8,6 +8,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 include(cmake/thirdparties/boost.cmake)
 include(cmake/thirdparties/rangev3.cmake)
 
+
+enable_testing()
 add_subdirectory(src)
 
 

@@ -103,14 +103,60 @@ BOOST_AUTO_TEST_CASE( Enumerate )
 }
 
 
+BOOST_AUTO_TEST_CASE( ExclusiveScan )
+{
+    BOOST_CHECK( are_equal( firstNats | ranges::view::exclusive_scan( 1, std::plus<int>{} ) , { 1, 5, 10, 16, 23, 31, 40 } ) );
+}
+
+
+BOOST_AUTO_TEST_CASE( Filter )
+{
+    BOOST_CHECK( are_equal( firstNats | ranges::view::filter( []( const auto a ) { return a % 2 == 0; } ), { 4, 6, 8, 10 } ) );
+}
+
+
+BOOST_AUTO_TEST_CASE( Indices )
+{
+    const int N = 1;
+    const int M = 6;
+
+    // make range of elements [0...M)
+    BOOST_CHECK( are_equal( ranges::view::indices( M ), { 0, 1, 2, 3, 4, 5 } ) );
+
+    // make range of elements [N...M)
+    BOOST_CHECK( are_equal( ranges::view::indices( N, M ), { 1, 2, 3, 4, 5 } ) );
+
+    // make range of elements [0...M]
+    BOOST_CHECK( are_equal( ranges::view::closed_indices( M ), { 0, 1, 2, 3, 4, 5, 6 } ) );
+
+    // make range of elements [N...M]
+    BOOST_CHECK( are_equal( ranges::view::closed_indices( N, M ), { 1, 2, 3, 4, 5, 6 } ) );
+}
+
+
+BOOST_AUTO_TEST_CASE( Ints )
+{
+    const int N = 1;
+    const int M = 6;
+
+    // make range of ints [0...
+    BOOST_CHECK( are_equal( ranges::view::ints | ranges::view::take( 7 ) , { 0, 1, 2, 3, 4, 5, 6 } ) );
+
+    // make range of ints [N...M)
+    BOOST_CHECK( are_equal( ranges::view::ints( N, M ), { 1, 2, 3, 4, 5 } ) );
+}
+
+
 BOOST_AUTO_TEST_CASE( Iota )
 {
   const int N = 1;
   const int M = 6;
 
+  // make range of elements [N...
+  BOOST_CHECK( are_equal( ranges::view::iota( N ) | ranges::view::take( 7 ), { 1, 2, 3, 4, 5, 6, 7 } ) );
+
   // make range of elements [N...M)
   BOOST_CHECK( are_equal( ranges::view::iota( N, M ), { 1, 2, 3, 4, 5 } ) );
-  BOOST_CHECK( are_equal( ranges::view::ints( N, M ), { 1, 2, 3, 4, 5 } ) );
 
   // make range of elements [N...M]
   BOOST_CHECK( are_equal( ranges::view::closed_iota( N, M ), { 1, 2, 3, 4, 5, 6 } ) );
@@ -136,7 +182,7 @@ BOOST_AUTO_TEST_CASE( Repeat )
   const int N = 9;
 
   // repeat value N infinite number of times and 5 elements are taken from the infinite range
-  BOOST_CHECK( are_equal( ranges::view::repeat( N ) | ranges::view::take( 5 ), { 9, 9, 9, 9, 9 } ) );
+  BOOST_CHECK( are_equal( ranges::view::repeat( N ) | ranges::view::take( 7 ), { 9, 9, 9, 9, 9, 9, 9 } ) );
 }
 
 
